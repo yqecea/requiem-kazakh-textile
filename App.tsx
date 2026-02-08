@@ -494,17 +494,21 @@ export default function App() {
                   />
                )}
 
-               {/* Arch Frames (Desktop) */}
+               {/* Geometric HUD Elements (Desktop) */}
                {!isMobile && (
-                  <div className="absolute inset-0 z-[1] flex justify-between items-center px-8 pointer-events-none">
-                     <div className="w-[15vw] max-w-[200px] h-[55vh] opacity-20 hidden lg:block">
-                        <ArchFrame src="/images/hero-arch-left.png" alt="Сәулет" className="h-full w-full" />
+                  <>
+                     <div className="absolute top-[15%] left-8 w-[200px] h-[200px] z-[1] pointer-events-none hidden lg:block">
+                        <GeometricAbstraction variant="circles" className="w-full h-full" />
                      </div>
-                     <div className="w-[15vw] max-w-[200px] h-[55vh] opacity-20 mt-16 hidden lg:block">
-                        <ArchFrame src="/images/hero-arch-right.png" alt="Сәулет" className="h-full w-full" />
+                     <div className="absolute bottom-[20%] right-8 w-[180px] h-[180px] z-[1] pointer-events-none hidden lg:block">
+                        <GeometricAbstraction variant="diamond" className="w-full h-full" />
                      </div>
-                  </div>
+                     <CoordinateMarker x="left-4" y="top-[40%]" label="X:00.421" />
+                     <CoordinateMarker x="right-4" y="top-[60%]" label="Y:91.003" />
+                     <CoordinateMarker x="left-[20%]" y="bottom-[15%]" label="Z:NOMADIC" />
+                  </>
                )}
+               <ScanLine />
 
                {/* Gradient overlay for text readability */}
                <div className="absolute inset-0 z-[2] bg-gradient-to-t from-void via-void/40 to-void/60" aria-hidden="true" />
@@ -564,7 +568,13 @@ export default function App() {
 
             {/* ══════════ SECTION 2: КІРІСПЕ / MANIFESTO ══════════ */}
             <section aria-label="Кіріспе" className="py-24 px-4 md:px-6 relative z-10 bg-void">
-               <div className="max-w-5xl mx-auto">
+               {/* Background geometric detail */}
+               <div className="absolute top-12 right-12 w-[300px] h-[300px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="grid" className="w-full h-full" />
+               </div>
+               <CoordinateMarker x="right-6" y="top-6" label="SEC:01.INTRO" />
+               <div className="max-w-5xl mx-auto relative">
+                  <CornerBrackets />
                   <SectionTitle subtitle={`${content.manifesto.sectionId} // ${content.manifesto.sectionLabel}`}>
                      {content.manifesto.title.split('\n').map((line, i) => (
                         <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>
@@ -592,6 +602,7 @@ export default function App() {
                         </div>
                      </div>
                   </div>
+                  <DataReadout lines={['ДЕРЕКТЕР: 2024-2026', 'ЖҮЙЕ: НОМАДИКАЛЫҚ', 'ФОРМАТ: ҒЫЛЫМИ', 'НҰСҚА: V2.1']} />
                </div>
             </section>
 
@@ -599,6 +610,15 @@ export default function App() {
 
             {/* ══════════ SECTION 3: КӨШПЕНДІ ИНЖЕНЕРИЯ / YURT ══════════ */}
             <section aria-label="Көшпенді инженерия" className="py-24 px-4 md:px-6 relative z-10">
+               {/* Background hex grid */}
+               <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none hidden xl:block">
+                  <HexGrid className="w-full h-full text-teal" />
+               </div>
+               <div className="absolute top-20 right-0 w-[250px] h-[250px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="angles" className="w-full h-full" />
+               </div>
+               <CoordinateMarker x="left-6" y="top-6" label="SEC:02.YURT" />
+               <CoordinateMarker x="right-6" y="bottom-6" label="DEPTH:ENGINEERING" />
                <div className="max-w-6xl mx-auto">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
                      {/* Left: Title + SVG */}
@@ -680,6 +700,15 @@ export default function App() {
             {/* ══════════ SECTION 4: ҮШ БАҒЫТ / TAXONOMY ══════════ */}
             <section aria-label="Таксономиялық сыныптау" className="py-24 bg-void-light relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-teal/20 to-transparent" aria-hidden="true" />
+               {/* Corner geometric details */}
+               <div className="absolute top-8 left-8 w-[200px] h-[200px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="diamond" className="w-full h-full" />
+               </div>
+               <div className="absolute bottom-8 right-8 w-[200px] h-[200px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="circles" className="w-full h-full" />
+               </div>
+               <CoordinateMarker x="right-6" y="top-6" label="SEC:03.TAXONOMY" />
+               <ScanLine />
 
                <div className="max-w-7xl mx-auto px-4 md:px-6">
                   <div className="mb-16">
@@ -726,7 +755,17 @@ export default function App() {
 
             {/* ══════════ SECTION 5: СЕМИОТИКА ══════════ */}
             <section aria-label="Семиотика" className="py-24 px-4 md:px-6 relative z-10">
-               <div className="max-w-6xl mx-auto">
+               {/* Background geometric details */}
+               <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[350px] h-[350px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="grid" className="w-full h-full" />
+               </div>
+               <div className="absolute top-16 left-4 w-[150px] h-[150px] pointer-events-none hidden xl:block">
+                  <GeometricAbstraction variant="angles" className="w-full h-full" />
+               </div>
+               <CoordinateMarker x="left-6" y="top-6" label="SEC:04.SEMIOTICS" />
+               <CoordinateMarker x="right-6" y="bottom-6" label="CIPHER:ACTIVE" />
+               <div className="max-w-6xl mx-auto relative">
+                  <CornerBrackets />
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-24 border-b border-cream/10 pb-8 md:pb-12 gap-6">
                      <SectionTitle subtitle={`${content.semiotics.sectionId} // ${content.semiotics.sectionLabel}`}>
                         {content.semiotics.title.split('\n').map((line, i) => (
@@ -856,6 +895,10 @@ export default function App() {
 
             {/* ══════════ SECTION 6: КӨРМЕ / GALLERY (C5 — Content now always visible on mobile) ══════════ */}
             <section ref={galleryRef} aria-label="Артефакт галереясы" className="relative h-screen overflow-hidden bg-void-light">
+               <CoordinateMarker x="right-6" y="top-6" label="SEC:05.GALLERY" />
+               <div className="absolute bottom-12 left-12 w-[200px] h-[200px] pointer-events-none hidden xl:block z-10">
+                  <GeometricAbstraction variant="diamond" className="w-full h-full" />
+               </div>
                <div className="absolute top-0 left-0 w-full z-20 p-8 md:p-12">
                   <SectionTitle subtitle={`${content.gallery.sectionId} // ${content.gallery.sectionLabel}`}>
                      {content.gallery.title.split('\n').map((line, i) => (
@@ -882,6 +925,13 @@ export default function App() {
 
             {/* ══════════ SECTION 7: ЗАМАНАУИ АҒЫМДАР / CONTEMPORARY ══════════ */}
             <section aria-label="Заманауи ағымдар" className="py-24 relative">
+               <CoordinateMarker x="left-6" y="top-6" label="SEC:06.CONTEMPORARY" />
+               <div className="absolute top-12 right-12 w-[250px] h-[250px] pointer-events-none hidden xl:block z-[1]">
+                  <HexGrid className="w-full h-full text-cream" />
+               </div>
+               <div className="absolute bottom-12 left-12 w-[300px] h-[300px] pointer-events-none hidden xl:block z-[1]">
+                  <GeometricAbstraction variant="circles" className="w-full h-full" />
+               </div>
                <div className="absolute inset-0 z-0">
                   <img
                      src="/images/section-bg-grain.png"
@@ -999,7 +1049,12 @@ export default function App() {
 
          {/* ══════════ SECTION 8: FOOTER / МҰРА ══════════ */}
          <footer className="py-24 px-4 md:px-6 border-t border-cream/5 bg-void relative overflow-hidden" role="contentinfo">
-            <div className="max-w-7xl mx-auto">
+            <CoordinateMarker x="left-6" y="top-6" label="SEC:07.HERITAGE" />
+            <div className="absolute top-8 right-8 w-[250px] h-[250px] pointer-events-none hidden xl:block">
+               <GeometricAbstraction variant="grid" className="w-full h-full" />
+            </div>
+            <div className="max-w-7xl mx-auto relative">
+               <CornerBrackets />
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-16">
                   {/* Left: Title + Description */}
                   <div className="col-span-1 lg:col-span-2">
