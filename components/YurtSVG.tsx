@@ -12,6 +12,8 @@ const YurtSVG: React.FC<YurtSVGProps> = ({ className = '' }) => {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReducedMotion) return;
 
+        let gsapCtx: any;
+
         const loadGSAP = async () => {
             try {
                 const gsapModule = await import('gsap');
@@ -33,39 +35,46 @@ const YurtSVG: React.FC<YurtSVGProps> = ({ className = '' }) => {
                     }
                 });
 
-                gsap.to(paths, {
-                    strokeDashoffset: 0,
-                    duration: 2,
-                    stagger: 0.15,
-                    ease: 'power2.inOut',
-                    scrollTrigger: {
-                        trigger: svgRef.current,
-                        start: 'top 80%',
-                        end: 'bottom 20%',
-                        toggleActions: 'play none none reverse',
-                    },
-                });
-
-                gsap.fromTo(labels,
-                    { opacity: 0, y: 10 },
-                    {
-                        opacity: 1, y: 0,
-                        duration: 0.8,
-                        stagger: 0.2,
-                        delay: 1.5,
-                        ease: 'power2.out',
+                // Wrap in gsap.context for automatic cleanup on unmount
+                gsapCtx = gsap.context(() => {
+                    gsap.to(paths, {
+                        strokeDashoffset: 0,
+                        duration: 2,
+                        stagger: 0.15,
+                        ease: 'power2.inOut',
                         scrollTrigger: {
                             trigger: svgRef.current,
-                            start: 'top 70%',
+                            start: 'top 80%',
+                            end: 'bottom 20%',
                             toggleActions: 'play none none reverse',
                         },
-                    }
-                );
+                    });
+
+                    gsap.fromTo(labels,
+                        { opacity: 0, y: 10 },
+                        {
+                            opacity: 1, y: 0,
+                            duration: 0.8,
+                            stagger: 0.2,
+                            delay: 1.5,
+                            ease: 'power2.out',
+                            scrollTrigger: {
+                                trigger: svgRef.current,
+                                start: 'top 70%',
+                                toggleActions: 'play none none reverse',
+                            },
+                        }
+                    );
+                }, svgRef);
             } catch {
                 // P3: Silently fail — GSAP is non-critical for content
             }
         };
         loadGSAP();
+
+        return () => {
+            if (gsapCtx) gsapCtx.revert();
+        };
     }, []);
 
     return (

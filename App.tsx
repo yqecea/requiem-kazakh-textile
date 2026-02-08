@@ -170,6 +170,9 @@ const FRAME_URLS = Array.from(
    (_, i) => `/frames/frame_${String(i + 1).padStart(4, '0')}.webp`
 );
 
+/* ── Module-scoped frame storage (avoids `window as any`) ── */
+let __heroFrames: HTMLImageElement[] | null = null;
+
 export default function App() {
    const containerRef = useRef<HTMLDivElement>(null);
    const galleryRef = useRef<HTMLDivElement>(null);
@@ -190,9 +193,12 @@ export default function App() {
       }
    }, []);
 
-   /* ── Device Detection ── */
+   /* ── Device Detection + Resize Handler ── */
    useEffect(() => {
-      setIsMobile(window.innerWidth <= 768);
+      const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
    }, []);
 
    /* ── Frame Preloader (Desktop only) ── */
@@ -235,19 +241,20 @@ export default function App() {
          images.push(img);
       });
 
-      // Store images on window for GSAP to access
-      (window as any).__heroFrames = images;
+      // Store images in module scope for GSAP to access
+      __heroFrames = images;
 
       return () => {
-         (window as any).__heroFrames = null;
+         __heroFrames = null;
       };
    }, [isMobile]);
 
-   /* ── GSAP + Lenis Init ── */
+   /* ── GSAP + Lenis Init (with gsap.context for proper cleanup) ── */
    useEffect(() => {
       if (!isLoaded) return;
 
       let lenis: any;
+      let gsapCtx: any;
       // Check reduced motion preference (C1)
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReducedMotion) return;
@@ -273,111 +280,114 @@ export default function App() {
             gsap.ticker.add((time: number) => lenis.raf(time * 1000));
             gsap.ticker.lagSmoothing(0);
 
-            // ── Hero Frame Scrubbing (Desktop only) ──
-            if (!isMobile) {
-               const canvas = canvasRef.current;
-               const heroSection = heroSectionRef.current;
-               const images = (window as any).__heroFrames as HTMLImageElement[];
+            // Wrap all GSAP animations in gsap.context() for automatic cleanup
+            gsapCtx = gsap.context(() => {
+               // ── Hero Frame Scrubbing (Desktop only) ──
+               if (!isMobile) {
+                  const canvas = canvasRef.current;
+                  const heroSection = heroSectionRef.current;
+                  const images = __heroFrames;
 
-               if (canvas && heroSection && images && images.length > 0) {
-                  const ctx = canvas.getContext('2d')!;
-                  const dpr = window.devicePixelRatio || 1;
-                  canvas.width = 1920 * dpr;
-                  canvas.height = 1080 * dpr;
-                  ctx.scale(dpr, dpr);
+                  if (canvas && heroSection && images && images.length > 0) {
+                     const ctx = canvas.getContext('2d')!;
+                     const dpr = window.devicePixelRatio || 1;
+                     canvas.width = 1920 * dpr;
+                     canvas.height = 1080 * dpr;
+                     ctx.scale(dpr, dpr);
 
-                  const playhead = { frame: 0 };
+                     const playhead = { frame: 0 };
 
-                  const updateImage = () => {
-                     const frameIndex = Math.round(playhead.frame);
-                     const img = images[Math.min(frameIndex, images.length - 1)];
-                     if (img && img.complete) {
-                        ctx.clearRect(0, 0, 1920, 1080);
-                        ctx.drawImage(img, 0, 0, 1920, 1080);
-                     }
-                  };
+                     const updateImage = () => {
+                        const frameIndex = Math.round(playhead.frame);
+                        const img = images[Math.min(frameIndex, images.length - 1)];
+                        if (img && img.complete) {
+                           ctx.clearRect(0, 0, 1920, 1080);
+                           ctx.drawImage(img, 0, 0, 1920, 1080);
+                        }
+                     };
 
-                  // Draw first frame
-                  updateImage();
+                     // Draw first frame
+                     updateImage();
 
-                  gsap.to(playhead, {
-                     frame: images.length - 1,
-                     ease: 'none',
-                     onUpdate: updateImage,
-                     scrollTrigger: {
-                        trigger: heroSection,
-                        start: 'top top',
-                        end: '+=300%',
-                        pin: true,
-                        scrub: 1,
-                        anticipatePin: 1,
-                        snap: {
-                           snapTo: [0, 0.35, 0.70, 1],
-                           duration: { min: 0.4, max: 1.2 },
-                           ease: 'power2.inOut',
-                           inertia: false,
-                           directional: false,
-                        },
-                     },
-                  });
-
-                  // Hero text parallax fade
-                  const heroContent = heroSection.querySelector('.hero-content');
-                  if (heroContent) {
-                     gsap.to(heroContent, {
-                        opacity: 0,
-                        y: -80,
-                        ease: 'power1.out',
+                     gsap.to(playhead, {
+                        frame: images.length - 1,
+                        ease: 'none',
+                        onUpdate: updateImage,
                         scrollTrigger: {
                            trigger: heroSection,
                            start: 'top top',
-                           end: '+=150%',
-                           scrub: 1.5,
+                           end: '+=300%',
+                           pin: true,
+                           scrub: 1,
+                           anticipatePin: 1,
+                           snap: {
+                              snapTo: [0, 0.35, 0.70, 1],
+                              duration: { min: 0.4, max: 1.2 },
+                              ease: 'power2.inOut',
+                              inertia: false,
+                              directional: false,
+                           },
+                        },
+                     });
+
+                     // Hero text parallax fade
+                     const heroContent = heroSection.querySelector('.hero-content');
+                     if (heroContent) {
+                        gsap.to(heroContent, {
+                           autoAlpha: 0,
+                           y: -80,
+                           ease: 'power1.out',
+                           scrollTrigger: {
+                              trigger: heroSection,
+                              start: 'top top',
+                              end: '+=150%',
+                              scrub: 1.5,
+                           },
+                        });
+                     }
+                  }
+               }
+
+               // Section reveals (using autoAlpha for GPU-optimized visibility)
+               const revealEls = document.querySelectorAll('.reveal-up');
+               revealEls.forEach((el) => {
+                  gsap.to(el, {
+                     autoAlpha: 1,
+                     y: 0,
+                     duration: 1.2,
+                     ease: 'power3.out',
+                     scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse',
+                     },
+                  });
+               });
+
+               // Gallery horizontal scroll
+               const gallery = galleryRef.current;
+               if (gallery) {
+                  const track = gallery.querySelector('.gallery-track') as HTMLElement;
+                  if (track) {
+                     const totalWidth = track.scrollWidth - gallery.clientWidth;
+                     gsap.to(track, {
+                        x: -totalWidth,
+                        ease: 'none',
+                        scrollTrigger: {
+                           trigger: gallery,
+                           start: 'top top',
+                           end: () => `+=${totalWidth}`,
+                           pin: true,
+                           scrub: 1,
+                           anticipatePin: 1,
                         },
                      });
                   }
                }
-            }
-
-            // Section reveals
-            const revealEls = document.querySelectorAll('.reveal-up');
-            revealEls.forEach((el) => {
-               gsap.to(el, {
-                  opacity: 1,
-                  y: 0,
-                  duration: 1.2,
-                  ease: 'power3.out',
-                  scrollTrigger: {
-                     trigger: el,
-                     start: 'top 85%',
-                     toggleActions: 'play none none reverse',
-                  },
-               });
-            });
-
-            // Gallery horizontal scroll
-            const gallery = galleryRef.current;
-            if (gallery) {
-               const track = gallery.querySelector('.gallery-track') as HTMLElement;
-               if (track) {
-                  const totalWidth = track.scrollWidth - gallery.clientWidth;
-                  gsap.to(track, {
-                     x: -totalWidth,
-                     ease: 'none',
-                     scrollTrigger: {
-                        trigger: gallery,
-                        start: 'top top',
-                        end: () => `+=${totalWidth}`,
-                        pin: true,
-                        scrub: 1,
-                        anticipatePin: 1,
-                     },
-                  });
-               }
-            }
+            }, containerRef); // Scope GSAP context to app container
          } catch (e) {
-            // P3: Silently swallow in production
-            if (typeof window !== 'undefined' && (window as any).__DEV__) {
+            // P3: Log in development only
+            if (import.meta.env.DEV) {
                // eslint-disable-next-line no-console
                console.warn('GSAP/Lenis init error:', e);
             }
@@ -387,6 +397,7 @@ export default function App() {
       init();
 
       return () => {
+         if (gsapCtx) gsapCtx.revert(); // kills all GSAP tweens + ScrollTriggers in context
          if (lenis) lenis.destroy();
       };
    }, [isLoaded, isMobile]);
@@ -835,7 +846,7 @@ export default function App() {
 
                      {/* Decoder Panel */}
                      <div className="relative h-[400px] md:h-[500px] border border-cream/5 bg-void-light/20 backdrop-blur-sm p-8 flex items-center justify-center overflow-hidden" aria-live="polite">
-                        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/black-linen.png')" }} aria-hidden="true" />
+                        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.08'/%3E%3C/svg%3E\")" }} aria-hidden="true" />
                         <div className="absolute inset-0 opacity-5"
                            style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, #2a7a9e 0%, transparent 70%)' }}
                            aria-hidden="true"
@@ -863,6 +874,7 @@ export default function App() {
                                              src={content.semiotics.symbols[activeSymbol].img}
                                              alt={content.semiotics.symbols[activeSymbol].name}
                                              className="w-28 h-28 md:w-36 md:h-36 object-contain"
+                                             loading="lazy"
                                           />
                                        </div>
                                        <h4 className="font-display text-3xl md:text-4xl italic text-cream">
