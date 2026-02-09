@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "target": "requiem-kz",
     "public": "dist",
     "ignore": [
       "firebase.json",
