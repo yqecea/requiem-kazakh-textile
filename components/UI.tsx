@@ -249,7 +249,6 @@ export const MetaBadge = ({
 );
 
 export const TechCard = ({
-  id,
   kazName,
   engName,
   description,

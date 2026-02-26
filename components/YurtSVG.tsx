@@ -198,14 +198,14 @@ const YurtSVG: React.FC<YurtSVGProps> = ({ className = '' }) => {
                 <g className="yurt-label" opacity={0}>
                     <rect x={310} y={108} width={120} height={20} rx={2} fill="#0a0a0b" fillOpacity={0.8} />
                     <text x={316} y={122} fill="#2a7a9e" fontSize={10} fontFamily="JetBrains Mono">
-                        ШАҢЫРАҚ (CROWN)
+                        SHANYRAK (CROWN)
                     </text>
                 </g>
 
                 <g className="yurt-label" opacity={0}>
                     <rect x={440} y={220} width={140} height={20} rx={2} fill="#0a0a0b" fillOpacity={0.8} />
                     <text x={446} y={234} fill="#e8e0d0" fontSize={10} fontFamily="JetBrains Mono">
-                        ҮЙҚ (DOME POLES)
+                        UYK (DOME POLES)
                     </text>
                     <line x1={435} y1={230} x2={400} y2={220} stroke="#e8e0d0" strokeWidth={0.5} opacity={0.5} />
                 </g>
@@ -213,7 +213,7 @@ const YurtSVG: React.FC<YurtSVGProps> = ({ className = '' }) => {
                 <g className="yurt-label" opacity={0}>
                     <rect x={440} y={360} width={140} height={20} rx={2} fill="#0a0a0b" fillOpacity={0.8} />
                     <text x={446} y={374} fill="#e8e0d0" fontSize={10} fontFamily="JetBrains Mono">
-                        КЕРЕГЕ (LATTICE)
+                        KEREGE (LATTICE)
                     </text>
                     <line x1={435} y1={370} x2={500} y2={370} stroke="#e8e0d0" strokeWidth={0.5} opacity={0.5} />
                 </g>
@@ -230,15 +230,15 @@ const YurtSVG: React.FC<YurtSVGProps> = ({ className = '' }) => {
             <div className="absolute top-4 left-4 font-mono text-[10px] space-y-2">
                 <div className="text-teal">SYSTEM STATUS: <span className="text-green-400">ONLINE</span></div>
                 <div className="text-mist/60">
-                    <div>• ҰЙЫҚ [DOME]</div>
+                    <div>• UYK [DOME]</div>
                     <div className="text-mist/40 pl-2">Structural Vault</div>
                 </div>
                 <div className="text-mist/60">
-                    <div>• КЕРЕГЕ [WALL]</div>
+                    <div>• KEREGE [WALL]</div>
                     <div className="text-mist/40 pl-2">Lattice Compression</div>
                 </div>
                 <div className="text-mist/60">
-                    <div>• ШАҢЫРАҚ [CROWN]</div>
+                    <div>• SHANYRAK [CROWN]</div>
                     <div className="text-mist/40 pl-2">Tension Ring / Oculus</div>
                 </div>
             </div>

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
    GridOverlay, GrainOverlay, StarIcon, GlobeIcon, CrosshairIcon,
    SectionTitle, Separator, ArchFrame, MetaBadge, TechCard,
    CornerBrackets, ScanLine, CoordinateMarker, HexGrid,
-   GeometricAbstraction, DiamondIcon, DataReadout,
+   GeometricAbstraction, DataReadout,
 } from './components/UI';
 import YurtSVG from './components/YurtSVG';
+import { HUDOverlay } from './components/hud/HUDOverlay';
 
 /* ═══════════════════════════════════════════════
    CONTENT DATA
@@ -15,70 +16,70 @@ import YurtSVG from './components/YurtSVG';
 const content = {
    hero: {
       title: 'REQUIEM',
-      subtitle: 'ҚАЗАҚ СӘНДІК ӨНЕРІ МЕН ТОҚЫМА ИНЖЕНЕРИЯСЫ',
-      meta: 'АҚПАН 2026 // ЖҮЙЕ: КӨШПЕЛІ // ТАЛДАУ: СЕМИОТИКА',
+      subtitle: 'KAZAKH DECORATIVE ARTS & TEXTILE ENGINEERING',
+      meta: 'FEBRUARY 2026 // SYSTEM: NOMADIC // ANALYSIS: SEMIOTICS',
    },
 
    manifesto: {
       sectionId: '01',
-      sectionLabel: 'КІРІСПЕ',
+      sectionLabel: 'INTRODUCTION',
       title: 'EPISTEMOLOGICAL\nCONTEXT',
-      content: 'Бұл трактат қазақ тоқыма өнерін қарапайым қолөнер ретінде емес, инженерия мен семиотиканың күрделі жүйесі ретінде қарастырады. Ғылыми стильге сәйкес, бұл есеп эволюцияны, технологиялық әдістемелерді және мәдені семиотиканы анықтау үшін объективті терминологияны қолданады.',
-      pullQuote: '«Қарапайым қолөнер емес — инженерия мен семиотиканың күрделі жүйесі»',
-      scope: 'СӘНДІК ӨНЕР & ТОҚЫМА ИНЖЕНЕРИЯСЫ',
+      content: 'This treatise considers Kazakh textile art not as a simple craft, but as a complex system of engineering and semiotics. Consistent with the scientific style, this report employs objective terminology to delineate evolution, technological methodologies, and cultural semiotics.',
+      pullQuote: '«Not a simple craft — a complex system of engineering and semiotics»',
+      scope: 'DECORATIVE ARTS & TEXTILE ENGINEERING',
    },
 
    yurt: {
       sectionId: '02',
-      sectionLabel: 'ТАРИХИ НЕГІЗ',
+      sectionLabel: 'HISTORICAL FOUNDATION',
       title: 'ENGINEERING\nAPEX',
-      content: 'Киіз үй — көшпелі тоқыма инженериясының шыңы. Ол жай тұрғын үй ғана емес, мамандандырылған тоқыма компоненттерінің композиті.',
+      content: 'The yurt is the apex of nomadic textile engineering. It is not merely a dwelling, but a composite of specialized textile components.',
       components: [
-         { id: '01', name: 'Тұрлық', nameEng: 'Tuyrlyk', desc: 'Кереге секцияларына қолданылатын киіз жабын.' },
-         { id: '02', name: 'Үзүк', nameEng: 'Uzuk', desc: 'Күмбез құрылымына арналған киіз жабын.' },
-         { id: '03', name: 'Баскүр', nameEng: 'Baskur', desc: 'Құрылымдық тұтастық пен ішкі сәндік үшін тоқылған таспалар.' },
+         { id: '01', name: 'Tuyrlyk', nameEng: 'Tuyrlyk', desc: 'Felt covering applied to kerege sections.' },
+         { id: '02', name: 'Uzuk', nameEng: 'Uzuk', desc: 'Felt covering for the dome structure.' },
+         { id: '03', name: 'Baskur', nameEng: 'Baskur', desc: 'Woven bands for structural integrity and interior decoration.' },
       ],
       footer: [
-         '> ТҰРЛЫҚ: ЖЫЛУ ҚАЛҚАНЫ',
-         '> ҮЗҮК: ГИДРОФОБТЫ КҮМБЕЗ',
-         '> БАСКҮР: СОЗЫЛУ АРМАТУРАСЫ',
+         '> TUYRLYK: THERMAL SHIELD',
+         '> UZUK: HYDROPHOBIC DOME',
+         '> BASKUR: TENSILE REINFORCEMENT',
       ],
    },
 
    taxonomy: {
       sectionId: '03',
-      sectionLabel: 'ТАКСОНОМИЯЛЫҚ СЫНЫПТАУ',
+      sectionLabel: 'TAXONOMIC CLASSIFICATION',
       title: 'THREE TECHNOLOGICAL\nVECTORS',
-      desc: 'Қатаң ғылыми зерттеу мақсатында өндіріс әдістемелерін жіктеу қажет.',
+      desc: 'For the purpose of rigorous scientific inquiry, it is necessary to classify production methodologies.',
       types: [
          {
-            kazName: 'КІГІЗ БАСУ',
+            kazName: 'FELTING',
             engName: 'Non-Woven Technologies',
-            detail: 'Жіптерді айқастырмай, жылу энергиясы, ылғал және механикалық қысым арқылы жасалған примордиалды тоқымасыз мата.',
+            detail: 'Primordial non-woven fabric created without interlacing yarns, through thermal energy, moisture, and mechanical pressure.',
             img: '/images/felt-making-process.png',
             subItems: [
-               { name: 'ТЕКЕМЕТ', desc: 'Боялған жүннің негізгі субстратқа қабаттасуы. Диффузды, жұмсартылған ауысулар.', img: '/images/tekemet-carpet.png' },
-               { name: 'СЫРМАҚ', desc: 'Мозаикалық әдістеме. Оң/Теріс кесу. Жоғары контрасттылық.', img: '/images/syrmak-carpet.png' },
+               { name: 'TEKEMET', desc: 'Layering of dyed wool on a primary substrate. Diffuse, softened transitions.', img: '/images/tekemet-carpet.png' },
+               { name: 'SYRMAK', desc: 'Mosaic methodology. Positive/Negative cutting. High contrast.', img: '/images/syrmak-carpet.png' },
             ],
          },
          {
-            kazName: 'ТОҚЫМА',
+            kazName: 'WEAVING',
             engName: 'Loom-Based Fabrication',
-            detail: 'Тегіс субстраттағы көтерілген, мақпал текстуралы ою генерациялау үшін күрделі «қосымша бүкіл» техникасы.',
+            detail: 'Complex "supplementary weft" technique to generate raised, velvet-textured ornamentation on a flat substrate.',
             img: '/images/ormek-loom.png',
             subItems: [
-               { name: 'АЛАША', desc: 'Жіңішке тоқылған кілем жолақтары, бойлық тігіспен.', img: '/images/alasha-strips.png' },
-               { name: 'БАСКҮР', desc: 'Ормекте тоқылған құрылымдық таспалар.', img: '/images/baskur-band.png' },
+               { name: 'ALASHA', desc: 'Narrow woven carpet strips, with longitudinal stitching.', img: '/images/alasha-strips.png' },
+               { name: 'BASKUR', desc: 'Structural bands woven on an ormek (loom).', img: '/images/baskur-band.png' },
             ],
          },
          {
-            kazName: 'КЕСТЕ',
+            kazName: 'EMBROIDERY',
             engName: 'Embroidered Adornment',
-            detail: 'Ілгекті аспаппен (біз) орындалатын тамбур кестесі. Тоқыманың ортогоналды шектеулерінен ерекше сұйық, қисық сызықты формалар.',
+            detail: 'Tambour embroidery executed with a hooked instrument (biz). Fluid, curvilinear forms distinct from the orthogonal constraints of weaving.',
             img: '/images/embroidery-tools.png',
             subItems: [
-               { name: 'БІЗ КЕСТЕ', desc: 'Үздіксіз тізбек тігісі. Сұйықтық.', img: '/images/biz-keste-detail.png' },
-               { name: 'ТҮСКИІЗ', desc: 'Кеңжерлі кеспе қабырға жабынлары. Әдейі толықсыздық (апотропаикалық).', img: '/images/tuskiiz-hanging.png' },
+               { name: 'BIZ KESTE', desc: 'Continuous chain stitch. Fluidity.', img: '/images/biz-keste-detail.png' },
+               { name: 'TUSKIIZ', desc: 'Large-scale embroidered wall hangings. Intentional incompleteness (apotropaic).', img: '/images/tuskiiz-hanging.png' },
             ],
          },
       ],
@@ -86,60 +87,60 @@ const content = {
 
    semiotics: {
       sectionId: '04',
-      sectionLabel: 'СЕМИОТИКА',
+      sectionLabel: 'SEMIOTICS',
       title: 'SECRET OF\nORNAMENT',
-      content: '«Ғылыми стиль» талдауы оюларды (ою-өрнек) жай сәндік безендіру емес, семиотикалық шифр немесе иконографиялық лексикон ретінде түсіндіруді талап етеді.',
+      content: 'The "scientific style" analysis requires interpreting ornaments (oyu-ornek) not merely as decorative adornment, but as a semiotic cipher or iconographic lexicon.',
       geometric: [
-         { name: 'Симметрия', desc: 'Бейнелеу симметриясы (билатералды сәйкестік) немесе айналу симметриясы (радиалды сәйкестік).' },
-         { name: 'Фрактал', desc: 'Бір композиция ішінде негізгі геометриялық мотив әртүрлі масштабтарда қайталанады.' },
+         { name: 'Symmetry', desc: 'Reflectional symmetry (bilateral correspondence) or rotational symmetry (radial correspondence).' },
+         { name: 'Fractal', desc: 'Within a single composition, the core geometric motif repeats across varying scales.' },
       ],
       symbols: [
-         { name: 'Қошқар Мүйіз', trans: 'Ram\'s Horn', meaning: 'Байлық, билік және тіршілік күшін білдіреді.', color: '#c8a96e', img: '/images/ornament-koshkar-muiz.png' },
-         { name: 'Құс Қанат', trans: 'Bird\'s Wing', meaning: 'Еркіндік пен ұмтылысты білдіреді.', color: '#2a7a9e', img: '/images/ornament-kus-kanat.png' },
-         { name: 'Түйе Табан', trans: 'Camel Footprint', meaning: 'Ұзақ сапар мен сауда алмасуын білдіреді.', color: '#d4a574', img: '/images/ornament-tuye-taban.png' },
-         { name: 'Жұлдыз', trans: 'Star', meaning: 'Аспан сферасы мен мәңгілікті білдіреді.', color: '#e8e0d0', img: '/images/ornament-juldyz.png' },
-         { name: 'Төрт Құлақ', trans: 'Four Ears', meaning: 'Төрт бағыт, құрылымдық тұтастық пен қорғауды білдіреді.', color: '#c8a96e', img: '/images/ornament-tort-kulak.png' },
+         { name: 'Koshkar Muiz', trans: 'Ram\'s Horn', meaning: 'Signifies wealth, power, and vital force.', color: '#c8a96e', img: '/images/ornament-koshkar-muiz.png' },
+         { name: 'Kus Kanat', trans: 'Bird\'s Wing', meaning: 'Signifies freedom and aspiration.', color: '#2a7a9e', img: '/images/ornament-kus-kanat.png' },
+         { name: 'Tuye Taban', trans: 'Camel Footprint', meaning: 'Signifies long journeys and trade exchange.', color: '#d4a574', img: '/images/ornament-tuye-taban.png' },
+         { name: 'Juldyz', trans: 'Star', meaning: 'Signifies the celestial sphere and eternity.', color: '#e8e0d0', img: '/images/ornament-juldyz.png' },
+         { name: 'Tort Kulak', trans: 'Four Ears', meaning: 'Signifies the four directions, structural integrity, and protection.', color: '#c8a96e', img: '/images/ornament-tort-kulak.png' },
       ],
    },
 
    gallery: {
       sectionId: '05',
-      sectionLabel: 'КӨРМЕ',
+      sectionLabel: 'GALLERY',
       title: 'ARTIFACT\nGALLERY',
       items: [
-         { name: 'Текемет', desc: 'Диффузды ою', src: '/images/gallery-01-tekemet-large.png' },
-         { name: 'Сырмақ', desc: 'Мозаикалық киіз', src: '/images/gallery-02-syrmak-large.png' },
-         { name: 'Түскиіз', desc: 'Тамбур кестесі', src: '/images/gallery-03-tuskiiz-ornate.png' },
-         { name: 'Алаша', desc: 'Тоқылған жолақтар', src: '/images/gallery-04-alasha-multicolor.png' },
-         { name: 'Баскүр', desc: 'Құрылымдық таспа', src: '/images/gallery-05-baskur-detail.png' },
-         { name: 'Біз Кесте', desc: 'Тізбек тігісі', src: '/images/gallery-06-composite.png' },
+         { name: 'Tekemet', desc: 'Diffuse ornament', src: '/images/gallery-01-tekemet-large.png' },
+         { name: 'Syrmak', desc: 'Mosaic felt', src: '/images/gallery-02-syrmak-large.png' },
+         { name: 'Tuskiiz', desc: 'Tambour embroidery', src: '/images/gallery-03-tuskiiz-ornate.png' },
+         { name: 'Alasha', desc: 'Woven strips', src: '/images/gallery-04-alasha-multicolor.png' },
+         { name: 'Baskur', desc: 'Structural band', src: '/images/gallery-05-baskur-detail.png' },
+         { name: 'Biz Keste', desc: 'Chain stitch', src: '/images/gallery-06-composite.png' },
       ],
    },
 
    contemporary: {
       sectionId: '06',
-      sectionLabel: 'ЗАМАНАУИ АҒЫМДАР',
+      sectionLabel: 'CONTEMPORARY TRENDS',
       title: 'PARADIGM\nSHIFT',
       trends: [
          {
             id: '01',
-            title: 'Нео-фольклорлық парадигма',
+            title: 'Neo-folkloric paradigm',
             titleEng: 'NEO-FOLKLORIC PARADIGM',
-            desc: 'Жоғары сән мен сандық кестенің бірігуі. Функционалды тіршілік ету стратегиясынан жоғары сән сәйкестігіне ауысу.',
+            desc: 'Integration of high fashion and digital embroidery. Transition from functional survival strategy to high fashion identity.',
             large: true,
          },
          {
             id: '02',
-            title: 'Экологиялық қайтарылу',
+            title: 'Ecological return',
             titleEng: 'ECOLOGICAL RETURN',
-            desc: 'Жүн vs. полиэстер. Биоыдырау талдауы дәстүрлі жүн киіздің микропластик ластануына ықпал етпейтінін растайды.',
+            desc: 'Wool vs. polyester. Biodegradation analysis confirms that traditional wool felt does not contribute to microplastic pollution.',
             large: false,
          },
          {
             id: '03',
-            title: 'Цифрлық синтез',
+            title: 'Digital synthesis',
             titleEng: 'DIGITAL SYNTHESIS',
-            desc: 'Алгоритмдік ою генерациясы',
+            desc: 'Algorithmic ornament generation',
             large: false,
          },
       ],
@@ -147,11 +148,11 @@ const content = {
 
    footer: {
       title: 'LEGACY',
-      content: '«Сәндік өнер және тоқыма дизайнын» зерттеу — эстетикалық іздеу ғана емес, көпсалалы ғылыми жұмыс.',
+      content: 'The study of "Decorative arts and textile design" is not merely an aesthetic pursuit, but a multidisciplinary scientific endeavor.',
       disciplines: [
-         { name: 'Химия ғылымдары', desc: 'Табиғи пигменттер мен кератин ақуыз құрылымдарын талдау.' },
-         { name: 'Математика ғылымдары', desc: 'Ою-өрнектегі күрделі геометриялық симметрияны есептеу.' },
-         { name: 'Әлеуметтану ғылымдары', desc: 'Көшпелі талисмандардан ұлттық сәйкестіктің заманауи индикаторларына дейін.' },
+         { name: 'Chemical Sciences', desc: 'Analysis of natural pigments and keratin protein structures.' },
+         { name: 'Mathematical Sciences', desc: 'Computation of complex geometric symmetry in ornamentation.' },
+         { name: 'Sociological Sciences', desc: 'From nomadic talismans to contemporary indicators of national identity.' },
       ],
    },
 };
@@ -178,8 +179,6 @@ export default function App() {
    const galleryRef = useRef<HTMLDivElement>(null);
    const heroSectionRef = useRef<HTMLElement>(null);
    const canvasRef = useRef<HTMLCanvasElement>(null);
-   const { scrollYProgress } = useScroll();
-   const heroOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
    const [activeSymbol, setActiveSymbol] = useState<number | null>(null);
    const [loadingProgress, setLoadingProgress] = useState(0);
    const [isLoaded, setIsLoaded] = useState(false);
@@ -221,7 +220,7 @@ export default function App() {
             if (canvas && images[0]) {
                const ctx = canvas.getContext('2d');
                if (ctx) {
-                  const dpr = window.devicePixelRatio || 1;
+                  const dpr = Math.min(window.devicePixelRatio || 1, 2);
                   canvas.width = 1920 * dpr;
                   canvas.height = 1080 * dpr;
                   ctx.scale(dpr, dpr);
@@ -255,6 +254,8 @@ export default function App() {
 
       let lenis: any;
       let gsapCtx: any;
+      let gsapInstance: any;
+      let rafCallback: any;
       // Check reduced motion preference (C1)
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReducedMotion) return;
@@ -277,7 +278,9 @@ export default function App() {
             });
 
             lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add((time: number) => lenis.raf(time * 1000));
+            rafCallback = (time: number) => lenis.raf(time * 1000);
+            gsapInstance = gsap;
+            gsap.ticker.add(rafCallback);
             gsap.ticker.lagSmoothing(0);
 
             // Wrap all GSAP animations in gsap.context() for automatic cleanup
@@ -290,7 +293,7 @@ export default function App() {
 
                   if (canvas && heroSection && images && images.length > 0) {
                      const ctx = canvas.getContext('2d')!;
-                     const dpr = window.devicePixelRatio || 1;
+                     const dpr = Math.min(window.devicePixelRatio || 1, 2);
                      canvas.width = 1920 * dpr;
                      canvas.height = 1080 * dpr;
                      ctx.scale(dpr, dpr);
@@ -339,51 +342,195 @@ export default function App() {
                            ease: 'power1.out',
                            scrollTrigger: {
                               trigger: heroSection,
-                              start: 'top top',
-                              end: '+=150%',
+                              start: 'top -10%', // Delay fade slightly
+                              end: '+=100%',     // Complete fade smoothly
                               scrub: 1.5,
+                           },
+                        });
+                     }
+                  }
+
+                  // ── Hero Text Complex Animation ──
+                  const heroTl = gsap.timeline({ delay: 0.5 });
+
+                  // 2. Fade in all characters smoothly
+                  heroTl.to('.requiem-text span', {
+                     autoAlpha: 1,
+                     duration: 1.5,
+                     ease: "power2.out",
+                     stagger: {
+                        amount: 1.5,
+                        from: "random"
+                     }
+                  });
+
+                  // 3. Fill the text with solid color & shadow
+                  heroTl.to('.requiem-text', {
+                     color: 'var(--color-cream)',
+                     textShadow: '0 0 30px rgba(232, 224, 208, 0.3)',
+                     duration: 1.2,
+                     onComplete: () => {
+                        const textEl = document.querySelector('.requiem-text');
+                        if (textEl) {
+                           textEl.classList.add('glitch-text');
+                           // @ts-ignore - WebkitTextStroke support
+                           textEl.style.webkitTextStroke = '0';
+                        }
+                     }
+                  }, "-=0.5");
+
+
+
+                  // Section reveals (using autoAlpha for GPU-optimized visibility)
+                  const revealEls = document.querySelectorAll('.reveal-up');
+                  revealEls.forEach((el) => {
+                     gsap.to(el, {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 1.2,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                           trigger: el,
+                           start: 'top 95%',
+                           toggleActions: 'play none none none',
+                        },
+                     });
+                  });
+
+                  // Gallery horizontal scroll
+                  const gallery = galleryRef.current;
+                  if (gallery) {
+                     const track = gallery.querySelector('.gallery-track') as HTMLElement;
+                     if (track) {
+                        const totalWidth = track.scrollWidth - gallery.clientWidth;
+                        gsap.fromTo(track, 
+                           { x: -totalWidth },
+                           {
+                           x: 0,
+                           ease: 'none',
+                           scrollTrigger: {
+                              trigger: gallery,
+                              start: 'top top',
+                              end: () => `+=${totalWidth}`,
+                              pin: true,
+                              scrub: 1,
+                              anticipatePin: 1,
                            },
                         });
                      }
                   }
                }
 
-               // Section reveals (using autoAlpha for GPU-optimized visibility)
-               const revealEls = document.querySelectorAll('.reveal-up');
-               revealEls.forEach((el) => {
-                  gsap.to(el, {
-                     autoAlpha: 1,
-                     y: 0,
+               // ══════════ NEW SECTIONS GSAP ANIMATIONS ══════════
+
+               // Text Splitting is now handled cleanly in React markup
+
+               // Manifesto Text Animation
+               gsap.fromTo('.gs-split-text .split-word',
+                  { y: '50%', opacity: 0 },
+                  {
+                     y: '0%', opacity: 1,
                      duration: 1.2,
+                     stagger: 0.05,
+                     ease: 'power4.out',
+                     scrollTrigger: {
+                        trigger: '#manifesto-spatial-section',
+                        start: 'top 90%',
+                     }
+                  }
+               );
+
+               // Manifesto fade-up paragraph
+               gsap.fromTo('.gs-fade-up',
+                  { y: 50, opacity: 0 },
+                  {
+                     y: 0, opacity: 1, duration: 1.5, ease: 'power3.out',
+                     scrollTrigger: {
+                        trigger: '.gs-fade-up',
+                        start: 'top 95%',
+                     }
+                  }
+               );
+
+               // Bento Card Stagger Reveal
+               gsap.fromTo('.bento-card',
+                  { y: 100, opacity: 0, scale: 0.95 },
+                  {
+                     y: 0, opacity: 1, scale: 1,
+                     duration: 1,
+                     stagger: 0.1,
                      ease: 'power3.out',
                      scrollTrigger: {
-                        trigger: el,
+                        trigger: '#features-section',
                         start: 'top 85%',
-                        toggleActions: 'play none none reverse',
+                     }
+                  }
+               );
+
+               // Bar Chart Animation
+               gsap.fromTo('.gs-bar',
+                  { scaleY: 0, transformOrigin: 'bottom' },
+                  {
+                     scaleY: 1,
+                     duration: 1.5,
+                     stagger: 0.1,
+                     ease: 'expo.out',
+                     scrollTrigger: {
+                        trigger: '.gs-bar',
+                        start: 'top 95%',
+                     }
+                  }
+               );
+
+               // Telemetry Node Map Path Animation
+               gsap.fromTo('.gs-node-path',
+                  { strokeDasharray: 100, strokeDashoffset: 100 },
+                  {
+                     strokeDashoffset: 0,
+                     duration: 2,
+                     ease: 'power2.inOut',
+                     scrollTrigger: {
+                        trigger: '#telemetry-section',
+                        start: 'top 85%',
+                     }
+                  }
+               );
+
+               // Telemetry Node Scale-in
+               gsap.fromTo('.gs-node',
+                  { scale: 0, transformOrigin: 'center' },
+                  {
+                     scale: 1,
+                     duration: 0.5,
+                     stagger: 0.1,
+                     ease: 'back.out(2)',
+                     scrollTrigger: {
+                        trigger: '#telemetry-section',
+                        start: 'top 85%',
+                     }
+                  }
+               );
+
+               // Terminal Logs typing effect
+               const termLogs = document.querySelectorAll('#terminal-logs p:not(:last-child)');
+               if (termLogs.length > 0) {
+                  gsap.set(termLogs, { opacity: 0, x: -10 });
+                  ScrollTrigger.create({
+                     trigger: '#terminal-logs',
+                     start: 'top 80%',
+                     once: true,
+                     onEnter: () => {
+                        gsap.to(termLogs, {
+                           opacity: 1,
+                           x: 0,
+                           duration: 0.1,
+                           stagger: 0.2,
+                           ease: 'none',
+                        });
                      },
                   });
-               });
-
-               // Gallery horizontal scroll
-               const gallery = galleryRef.current;
-               if (gallery) {
-                  const track = gallery.querySelector('.gallery-track') as HTMLElement;
-                  if (track) {
-                     const totalWidth = track.scrollWidth - gallery.clientWidth;
-                     gsap.to(track, {
-                        x: -totalWidth,
-                        ease: 'none',
-                        scrollTrigger: {
-                           trigger: gallery,
-                           start: 'top top',
-                           end: () => `+=${totalWidth}`,
-                           pin: true,
-                           scrub: 1,
-                           anticipatePin: 1,
-                        },
-                     });
-                  }
                }
+
             }, containerRef); // Scope GSAP context to app container
          } catch (e) {
             // P3: Log in development only
@@ -398,6 +545,7 @@ export default function App() {
 
       return () => {
          if (gsapCtx) gsapCtx.revert(); // kills all GSAP tweens + ScrollTriggers in context
+         if (gsapInstance && rafCallback) gsapInstance.ticker.remove(rafCallback);
          if (lenis) lenis.destroy();
       };
    }, [isLoaded, isMobile]);
@@ -406,11 +554,12 @@ export default function App() {
       <div ref={containerRef} className="relative bg-void min-h-screen text-cream font-body selection:bg-teal/30 selection:text-void">
          {/* Skip to content link (C4) */}
          <a href="#main-content" className="skip-link">
-            Мазмұнға өту
+            Skip to content
          </a>
 
          <GridOverlay />
          <GrainOverlay />
+         <HUDOverlay />
 
          {/* ══════════ FIXED HEADER UI ══════════ */}
          <header className="fixed top-0 left-0 right-0 z-40 p-4 md:p-6 flex justify-between items-start mix-blend-difference pointer-events-none" role="banner">
@@ -457,7 +606,7 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8, ease: 'easeInOut' }}
                   className="fixed inset-0 z-[200] bg-void flex flex-col items-center justify-center"
-                  aria-label="Жүктеу"
+                  aria-label="Loading"
                >
                   <div className="flex flex-col items-center gap-6">
                      <div className="relative w-48 h-[2px] bg-cream/10 overflow-hidden">
@@ -468,7 +617,7 @@ export default function App() {
                         />
                      </div>
                      <div className="font-mono text-[10px] tracking-[0.3em] text-mist/50">
-                        ЖҮКТЕУ... {loadingProgress}/{FRAME_COUNT}
+                        LOADING... {loadingProgress}/{FRAME_COUNT}
                      </div>
                      <div className="font-pixel text-xs tracking-wider text-teal/40 mt-2">
                         REQUIEM
@@ -483,7 +632,7 @@ export default function App() {
             {/* ══════════ SECTION 1: HERO (SCROLLYTELLING) ══════════ */}
             <section
                ref={heroSectionRef}
-               aria-label="Басты бет"
+               aria-label="Home page"
                className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden"
             >
                {/* Canvas Background (Desktop) */}
@@ -537,15 +686,15 @@ export default function App() {
                   </motion.div>
 
                   <div className="relative">
-                     <motion.h1
-                        initial={{ scale: 0.9, opacity: 0, filter: 'blur(10px)' }}
-                        animate={{ scale: isLoaded ? 1 : 0.9, opacity: isLoaded ? 1 : 0, filter: isLoaded ? 'blur(0px)' : 'blur(10px)' }}
-                        transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }}
-                        className="font-pixel text-[18vw] md:text-[10vw] leading-[0.8] text-cream mix-blend-lighten z-20 relative glitch-text"
-                        data-text={content.hero.title}
-                     >
-                        {content.hero.title}
-                     </motion.h1>
+                     <h1 className="font-pixel text-[18vw] md:text-[10vw] leading-[0.8] text-cream mix-blend-lighten z-20 relative requiem-text" data-text="REQUIEM">
+                        <span className="opacity-0">R</span>
+                        <span className="opacity-0">E</span>
+                        <span className="opacity-0">Q</span>
+                        <span className="opacity-0">U</span>
+                        <span className="opacity-0">I</span>
+                        <span className="opacity-0">E</span>
+                        <span className="opacity-0">M</span>
+                     </h1>
                   </div>
 
                   <motion.p
@@ -564,7 +713,7 @@ export default function App() {
                      transition={{ delay: 1.5, duration: 1 }}
                      className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
                   >
-                     <span className="font-mono text-[8px] tracking-[0.4em] text-mist/30 uppercase">Айналдыру</span>
+                     <span className="font-mono text-[8px] tracking-[0.4em] text-mist/30 uppercase">Scroll</span>
                      <motion.div
                         animate={{ y: [0, 8, 0] }}
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
@@ -577,8 +726,275 @@ export default function App() {
                {/* Bottom Bar — now handled by persistent HUD above */}
             </section>
 
-            {/* ══════════ SECTION 2: КІРІСПЕ / MANIFESTO ══════════ */}
-            <section aria-label="Кіріспе" className="py-24 px-4 md:px-6 relative z-10 bg-void">
+            {/* ══════════ NEW SECTION: MANIFESTO & SPATIAL ENGINE ══════════ */}
+            <section className="relative w-full py-32 bg-void border-t border-cream/5 z-20" id="manifesto-spatial-section">
+               <div className="max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-16">
+
+                  {/* Section Header */}
+                  <div className="w-full flex justify-between items-end border-b border-cream/20 pb-4 mb-4">
+                     <h2 className="font-mono text-[10px] md:text-xs text-teal tracking-[0.2em] uppercase flex items-center gap-3">
+                        <span className="w-[4px] h-[4px] bg-teal animate-pulse" />
+                        Module 01 // Cognitive Architecture
+                     </h2>
+                     <span className="font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-mist/50">SYS.UPTIME: 99.994%</span>
+                  </div>
+
+                  {/* Massive Text Block */}
+                  <div className="w-full relative flex flex-col md:flex-row gap-12 justify-between items-start">
+                     <p className="font-pixel fluid-heading-lg leading-[0.85] text-cream/90 max-w-4xl mix-blend-exclusion gs-split-text tracking-tighter uppercase">
+                        {'WE TRAINED A NEURAL NETWORK ON EVERY STONE OF ANTIQUITY.'.split(' ').map((word, i) => (
+                           <span key={`w1-${i}`} className="split-line"><span className="split-word">{word}&nbsp;</span></span>
+                        ))}
+                        <br />
+                        {'NOW IT DREAMS IN VOLUMETRIC SPACE.'.split(' ').map((word, i) => (
+                           <span key={`w2-${i}`} className="split-line"><span className="split-word">{word}&nbsp;</span></span>
+                        ))}
+                     </p>
+                     <p className="font-mono text-[10px] md:text-xs text-mist/70 pt-4 md:w-1/3 leading-loose tracking-widest uppercase gs-fade-up border-l border-cream/10 pl-6">
+                        Requiem is not a rendering engine. It is a spatial intelligence protocol.
+                        Input raw geometric logic; output mathematically perfect, emotionally resonant
+                        environments that possess atmospheric weight and architectural soul.
+                     </p>
+                  </div>
+
+                  {/* Metric Ticker Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-cream/10 mt-12">
+                     <div className="bg-void p-6 flex flex-col gap-2 bento-card">
+                        <span className="font-mono text-[10px] text-mist/50">LATENCY / RT</span>
+                        <span className="font-mono text-2xl text-cream">1.4ms</span>
+                     </div>
+                     <div className="bg-void p-6 flex flex-col gap-2 bento-card">
+                        <span className="font-mono text-[10px] text-mist/50">POLYGON THROUGHPUT</span>
+                        <span className="font-mono text-2xl text-cream">47.2B/s</span>
+                     </div>
+                     <div className="bg-void p-6 flex flex-col gap-2 bento-card">
+                        <span className="font-mono text-[10px] text-mist/50">PHOTON BOUNCES</span>
+                        <span className="font-mono text-2xl text-cream">Infinite</span>
+                     </div>
+                     <div className="bg-void p-6 flex flex-col gap-2 bento-card relative overflow-hidden">
+                        <span className="font-mono text-[10px] text-mist/50">STATUS</span>
+                        <span className="font-mono text-2xl text-teal">ACTIVE</span>
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-teal/50 shadow-[0_0_10px_rgba(42,122,158,0.8)] scan-line" />
+                     </div>
+                  </div>
+               </div>
+            </section>
+
+            {/* ══════════ NEW SECTION: THE VAULT (CAPABILITIES) ══════════ */}
+            <section className="relative w-full py-32 bg-void overflow-hidden border-t border-cream/5" id="features-section">
+
+               {/* Large Background Typography */}
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-[0.03]">
+                  <h2 className="font-pixel text-[20vw] leading-[0.8] whitespace-nowrap text-transparent" style={{ WebkitTextStroke: '1px rgba(232,224,208,0.5)' }}>
+                     CAPABILITIES
+                  </h2>
+               </div>
+
+               <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
+                  <div className="grid grid-cols-12 gap-px bg-cream/5 border border-cream/5 p-px">
+
+                     {/* Bento Block 1: The Tall Arch */}
+                     <div className="col-span-12 md:col-span-5 row-span-2 bento-card p-0 flex flex-col group min-h-[500px] bg-void">
+                        <div className="relative w-full h-[60%] overflow-hidden">
+                           <img
+                              src="/images/neural-radiance.png"
+                              alt="Neural Radiance Fields"
+                              className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                              loading="lazy"
+                           />
+                           <div className="absolute top-0 right-4 w-px h-full bg-cream/10 z-10" />
+                           <div className="absolute inset-0 bg-gradient-to-t from-void via-transparent to-transparent" />
+                           <div className="absolute top-4 right-4 bg-void/60 backdrop-blur-md px-3 py-1 border border-cream/20 font-mono text-[9px] flex gap-2 items-center">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />
+                              RECORDING
+                           </div>
+                        </div>
+                        <div className="p-8 flex flex-col justify-end flex-grow border-t border-cream/10">
+                           <h3 className="font-pixel text-xl text-cream mb-4 uppercase tracking-tighter">Neural Radiance Fields</h3>
+                           <p className="font-mono text-[10px] leading-loose text-mist/70 uppercase tracking-widest">
+                              Bypass traditional rasterization. Requiem interprets spatial data via a proprietary NeRF architecture,
+                              calculating infinite light bounces in real-time.
+                           </p>
+                        </div>
+                     </div>
+
+                     {/* Bento Block 2: Data Panel */}
+                     <div className="col-span-12 md:col-span-7 row-span-1 bento-card p-8 flex flex-col justify-between group bg-void">
+                        <div className="flex justify-between items-start">
+                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-mist/30 group-hover:text-amber transition-colors">
+                              <rect x="3" y="3" width="18" height="18" />
+                              <line x1="3" y1="9" x2="21" y2="9" />
+                              <line x1="9" y1="21" x2="9" y2="9" />
+                           </svg>
+                           <span className="font-mono text-[10px] tracking-[0.2em] border border-cream/10 px-3 py-1 text-mist/50">MODULE_02</span>
+                        </div>
+                        <div className="mt-12">
+                           <h3 className="font-pixel text-xl text-cream mb-4 uppercase tracking-tighter">Atmospheric Scattering</h3>
+                           <p className="font-mono text-[10px] text-mist/70 leading-loose max-w-md uppercase tracking-widest">
+                              Simulate particulate matter, humidity, and microscopic dust density.
+                              Light interacts with the void precisely as it does in physical reality.
+                           </p>
+                        </div>
+                        <div className="w-full h-px bg-cream/10 mt-8 relative overflow-hidden">
+                           <div className="absolute top-0 left-0 h-full w-1/4 bg-amber -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out" />
+                        </div>
+                     </div>
+
+                     {/* Bento Block 3: The Graph */}
+                     <div className="col-span-12 md:col-span-3 row-span-1 bento-card p-6 flex flex-col items-center justify-center relative group bg-void">
+                        <div className="absolute inset-0 opacity-10 group-hover:opacity-30 transition-opacity bg-radial-[circle_at_center] from-amber to-transparent" />
+                        <div className="relative w-full h-32 flex items-end gap-[2px] px-4">
+                           <div className="w-1/6 bg-cream/10 hover:bg-cream transition-colors h-[20%] gs-bar" />
+                           <div className="w-1/6 bg-cream/10 hover:bg-cream transition-colors h-[40%] gs-bar" />
+                           <div className="w-1/6 bg-cream/20 hover:bg-cream transition-colors h-[30%] gs-bar" />
+                           <div className="w-1/6 bg-amber hover:bg-cream transition-colors h-[80%] gs-bar relative shadow-[0_0_15px_rgba(212,165,116,0.2)]">
+                              <div className="absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-[8px] opacity-0 group-hover:opacity-100 transition-opacity text-cream">MAX</div>
+                           </div>
+                           <div className="w-1/6 bg-cream/10 hover:bg-cream transition-colors h-[50%] gs-bar" />
+                           <div className="w-1/6 bg-cream/10 hover:bg-cream transition-colors h-[60%] gs-bar" />
+                        </div>
+                        <span className="font-mono text-[9px] tracking-widest text-mist/50 mt-6">TENSOR ALLOCATION</span>
+                     </div>
+
+                     {/* Bento Block 4: Typography Box — Inverted */}
+                     <div className="col-span-12 md:col-span-4 row-span-1 bento-card p-8 bg-cream text-void flex flex-col justify-between group origin-bottom-right transition-all">
+                        <p className="font-mono text-[10px] font-bold border-b border-void/20 pb-6 tracking-widest leading-loose uppercase">
+                           &ldquo;ARCHITECTURE IS THE MASTERLY, CORRECT AND MAGNIFICENT PLAY OF MASSES BROUGHT TOGETHER IN LIGHT.&rdquo;
+                        </p>
+                        <div className="mt-8 flex justify-between items-end">
+                           <span className="font-pixel text-lg tracking-tighter uppercase">— LE CORBUSIER</span>
+                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="group-hover:translate-x-2 transition-transform">
+                              <path d="M5 12h14M12 5l7 7-7 7" />
+                           </svg>
+                        </div>
+                     </div>
+
+                  </div>
+               </div>
+            </section>
+
+            {/* ══════════ NEW SECTION: TELEMETRY TERMINAL ══════════ */}
+            <section className="relative w-full py-32 bg-void border-t border-cream/5" id="telemetry-section">
+
+               {/* CRT Scanline Base */}
+               <div className="crt-overlay absolute inset-0 pointer-events-none opacity-20" />
+
+               <div className="max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-12">
+
+                  <div className="flex flex-col md:flex-row justify-between items-end mb-4 gap-4 border-b border-cream/10 pb-4">
+                     <h2 className="font-pixel text-4xl md:text-5xl lg:text-6xl text-cream tracking-tighter leading-none">SYSTEM <br /> TELEMETRY</h2>
+                     <div className="font-mono text-[10px] text-right text-mist/50 tracking-widest leading-loose uppercase">
+                        <p>LIVE READOUT // SECURE CONNECTION</p>
+                        <p className="text-teal">ENCRYPTION: AES-256-GCM</p>
+                     </div>
+                  </div>
+
+                  {/* Dashboard Terminal */}
+                  <div className="w-full border border-cream/20 bg-void/80 backdrop-blur-xl p-1 md:p-2 shadow-2xl relative">
+
+                     {/* Terminal Header */}
+                     <div className="flex justify-between items-center px-4 py-2 border-b border-cream/20 bg-cream/5">
+                        <div className="flex gap-1.5">
+                           <div className="w-2 h-2 bg-mist/30" />
+                           <div className="w-2 h-2 bg-mist/30" />
+                           <div className="w-2 h-2 bg-teal/50" />
+                        </div>
+                        <span className="font-mono text-[10px] tracking-widest text-mist/50">RQM_TERMINAL_V2</span>
+                        <div className="font-mono text-[10px] text-cream/50">192.168.1.1</div>
+                     </div>
+
+                     {/* Terminal Body Grid */}
+                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-cream/10 p-px h-[600px] overflow-hidden">
+
+                        {/* Col 1: CLI Log */}
+                        <div className="bg-void p-6 flex flex-col font-mono text-[11px] text-mist overflow-hidden relative" id="terminal-logs">
+                           <div className="absolute top-0 right-0 p-2 text-cream/20">LOGS</div>
+                           <div className="flex flex-col gap-1 mt-4">
+                              <p><span className="text-green-400">user@rqm:~$</span> initialize_engine --gpu 4</p>
+                              <p className="text-mist/50">[00:00:01] Bootstrapping VRAM nodes...</p>
+                              <p className="text-mist/50">[00:00:02] Loading geometric primitives (482,910 objects)</p>
+                              <p className="text-amber">[00:00:03] WARN: Memory limit nearing 80%</p>
+                              <p className="text-mist/50">[00:00:04] Establishing ray-tracing kernel</p>
+                              <p><span className="text-green-400">user@rqm:~$</span> run_simulation -env &quot;renaissance_ruin&quot;</p>
+                              <p className="text-mist/50">[00:00:05] Applying material shaders...</p>
+                              <p className="text-mist/50">[00:00:06] Calculating radiosity...</p>
+                              <p className="text-teal">[00:00:07] RENDER COMPLETE. Latency: 1.2ms</p>
+                              <p className="mt-2"><span className="text-green-400">user@rqm:~$</span> <span className="w-2 h-4 bg-cream inline-block animate-pulse align-middle" /></p>
+                           </div>
+                        </div>
+
+                        {/* Col 2: Wireframe/Node Visualizer */}
+                        <div className="bg-void p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 p-2 text-cream/20 font-mono text-[10px]">NODE_MAP</div>
+                           <svg viewBox="0 0 200 200" className="w-full h-full max-w-[300px] opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+                              <g stroke="rgba(232,224,208,0.2)" strokeWidth="1" fill="none">
+                                 {/* Perimeter of the regular hexagon */}
+                                 <path className="gs-node-path" d="M100,20 L169.3,60" />
+                                 <path className="gs-node-path" d="M169.3,60 L169.3,140" />
+                                 <path className="gs-node-path" d="M169.3,140 L100,180" />
+                                 <path className="gs-node-path" d="M100,180 L30.7,140" />
+                                 <path className="gs-node-path" d="M30.7,140 L30.7,60" />
+                                 <path className="gs-node-path" d="M30.7,60 L100,20" />
+                                 {/* Radiating spokes from center */}
+                                 <path className="gs-node-path" d="M100,100 L100,20" />
+                                 <path className="gs-node-path" d="M100,100 L169.3,60" />
+                                 <path className="gs-node-path" d="M100,100 L169.3,140" />
+                                 <path className="gs-node-path" d="M100,100 L100,180" />
+                                 <path className="gs-node-path" d="M100,100 L30.7,140" />
+                                 <path className="gs-node-path" d="M100,100 L30.7,60" />
+                              </g>
+                              <g fill="var(--color-void)" stroke="var(--color-teal)" strokeWidth="2">
+                                 <circle cx="100" cy="20" r="4" className="gs-node" />
+                                 <circle cx="169.3" cy="60" r="4" className="gs-node" />
+                                 <circle cx="169.3" cy="140" r="4" className="gs-node" />
+                                 <circle cx="100" cy="180" r="4" className="gs-node" />
+                                 <circle cx="30.7" cy="140" r="4" className="gs-node" />
+                                 <circle cx="30.7" cy="60" r="4" className="gs-node" />
+                                 <circle cx="100" cy="100" r="6" fill="var(--color-teal)" className="gs-node" />
+                              </g>
+                           </svg>
+                           <div className="absolute bottom-4 left-4 font-mono text-[10px] text-cream/60 flex flex-col gap-1">
+                              <span>V-SYNC: <span className="text-green-400">LOCKED</span></span>
+                              <span>NODE_01: ONLINE</span>
+                              <span>NODE_02: ONLINE</span>
+                           </div>
+                        </div>
+
+                        {/* Col 3: Live Statistics */}
+                        <div className="bg-void p-6 flex flex-col font-mono relative">
+                           <div className="absolute top-0 right-0 p-2 text-cream/20 font-mono text-[10px]">SYS_STATS</div>
+                           <div className="flex flex-col h-full justify-between mt-8">
+                              <div className="border-l-2 border-teal pl-4">
+                                 <div className="text-[10px] text-mist/50 mb-1 tracking-widest">CORE TEMPERATURE</div>
+                                 <div className="font-pixel text-2xl lg:text-3xl text-cream tracking-tighter">42.4°C</div>
+                              </div>
+                              <div className="border-l-2 border-amber/50 pl-4">
+                                 <div className="text-[10px] text-mist/50 mb-1 tracking-widest">COMPUTE LOAD</div>
+                                 <div className="font-pixel text-2xl lg:text-3xl text-cream tracking-tighter">84.7%</div>
+                                 <div className="w-full bg-cream/10 h-1 mt-2">
+                                    <div className="bg-amber h-full w-[84.7%]" />
+                                 </div>
+                              </div>
+                              <div className="border-l-2 border-cream/20 pl-4">
+                                 <div className="text-[10px] text-mist/50 mb-1 tracking-widest">SPATIAL CACHE</div>
+                                 <div className="font-pixel text-2xl lg:text-3xl text-cream tracking-tighter">1.2TB</div>
+                                 <div className="text-[10px] text-mist/50 mt-1 tracking-widest">FLUSHING IN 04:12</div>
+                              </div>
+                              <div className="w-full h-12 mt-4 opacity-50 flex flex-wrap gap-1">
+                                 <div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/80" /><div className="w-2 h-2 bg-cream/20" />
+                                 <div className="w-2 h-2 bg-teal" /><div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/20" />
+                                 <div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/20" /><div className="w-2 h-2 bg-cream/50" />
+                              </div>
+                           </div>
+                        </div>
+
+                     </div>
+                  </div>
+               </div>
+            </section>
+
+            {/* ══════════ SECTION 2: INTRODUCTION / MANIFESTO ══════════ */}
+            <section aria-label="Introduction" className="py-24 px-4 md:px-6 relative z-10 bg-void">
                {/* Background geometric detail */}
                <div className="absolute top-12 right-12 w-[300px] h-[300px] pointer-events-none hidden xl:block">
                   <GeometricAbstraction variant="grid" className="w-full h-full" />
@@ -604,23 +1020,23 @@ export default function App() {
                         </blockquote>
                      </div>
                      <div className="border-l border-teal/20 pl-6 font-mono text-xs space-y-3 text-teal/70">
-                        <p>МАҚСАТ: ҚҰРЫЛЫМДЫҚ САЛЫСТЫРУ</p>
-                        <p>МӘРТЕБЕ: ҒЫЛЫМИ СТИЛЬ ТАЛДАУЫ</p>
-                        <p className="mt-6 text-mist/30">АУМАҚ: {content.manifesto.scope}</p>
+                        <p>OBJECTIVE: STRUCTURAL COMPARISON</p>
+                        <p>STATUS: SCIENTIFIC STYLE ANALYSIS</p>
+                        <p className="mt-6 text-mist/30">AREA: {content.manifesto.scope}</p>
                         <div className="mt-8 pt-4 border-t border-cream/5">
-                           <MetaBadge label="ДЕРЕКТЕР КӨЗІ" value="ЭМПИРИКАЛЫҚ БАҚЫЛАУ 2024-2025" />
-                           <MetaBadge label="ЖҮЙЕ" value="НОМАДИКАЛЫҚ АЛГОРИТМ V1" accent />
+                           <MetaBadge label="DATA SOURCE" value="EMPIRICAL OBSERVATION 2024-2025" />
+                           <MetaBadge label="SYSTEM" value="NOMADIC ALGORITHM V1" accent />
                         </div>
                      </div>
                   </div>
-                  <DataReadout lines={['ДЕРЕКТЕР: 2024-2026', 'ЖҮЙЕ: НОМАДИКАЛЫҚ', 'ФОРМАТ: ҒЫЛЫМИ', 'НҰСҚА: V2.1']} />
+                  <DataReadout lines={['DATA: 2024-2026', 'SYSTEM: NOMADIC', 'FORMAT: SCIENTIFIC', 'VERSION: V2.1']} />
                </div>
             </section>
 
             <Separator />
 
-            {/* ══════════ SECTION 3: КӨШПЕНДІ ИНЖЕНЕРИЯ / YURT ══════════ */}
-            <section aria-label="Көшпенді инженерия" className="py-24 px-4 md:px-6 relative z-10">
+            {/* ══════════ SECTION 3: NOMADIC ENGINEERING / YURT ══════════ */}
+            <section aria-label="Nomadic engineering" className="py-24 px-4 md:px-6 relative z-10">
                {/* Background hex grid */}
                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none hidden xl:block">
                   <HexGrid className="w-full h-full text-teal" />
@@ -630,10 +1046,11 @@ export default function App() {
                </div>
                <CoordinateMarker x="left-6" y="top-6" label="SEC:02.YURT" />
                <CoordinateMarker x="right-6" y="bottom-6" label="DEPTH:ENGINEERING" />
+
                <div className="max-w-6xl mx-auto">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 relative">
                      {/* Left: Title + SVG */}
-                     <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+                     <div className="lg:col-span-5 lg:sticky lg:top-24 self-start relative z-10">
                         <SectionTitle subtitle={`${content.yurt.sectionId} // ${content.yurt.sectionLabel}`}>
                            {content.yurt.title.split('\n').map((line, i) => (
                               <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>
@@ -645,19 +1062,68 @@ export default function App() {
                         <div className="w-full aspect-[6/5] border border-cream/5 bg-void-light/30 relative overflow-hidden">
                            <YurtSVG className="w-full h-full" />
                         </div>
+                     </div>
 
-                        {/* Spinning Cosmos (MVP vibe) */}
-                        <div className="w-full aspect-square border border-teal/20 rounded-full flex items-center justify-center relative overflow-hidden mt-6">
+                     {/* Spinning Cosmos (Orbital Placement - Breaks the grid tension) */}
+                     <div className="hidden lg:flex absolute left-[35%] top-[55%] -translate-y-1/2 w-[340px] aspect-square items-center justify-center overflow-visible z-20 pointer-events-none mix-blend-screen opacity-90 drop-shadow-[0_0_40px_rgba(42,122,158,0.2)]">
+                        {/* Outer rotating text ring */}
+                        <div className="absolute inset-0 z-20" style={{ animation: 'spin 40s linear infinite' }}>
+                           <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
+                              <path id="cosmos-text-path" d="M 50, 50 m -46, 0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" fill="transparent" />
+                              <text className="text-[7.5px] font-mono fill-cream/80 tracking-[0.2em] uppercase" aria-hidden="true">
+                                 <textPath href="#cosmos-text-path" startOffset="0%">
+                                    THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖
+                                 </textPath>
+                              </text>
+                           </svg>
+                        </div>
+
+                        {/* Inner geometric rings */}
+                        <div className="absolute w-[80%] h-[80%] rounded-full overflow-hidden border border-teal/20 backdrop-blur-[2px]">
+                           <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay" style={{ backgroundImage: "url('/images/yurt-interior.png')" }} />
+                           <div className="absolute inset-0 border border-cream/10 rounded-full" style={{ animation: 'spin 20s linear infinite' }} />
+                           <div className="absolute top-[10%] left-[10%] w-[80%] h-[80%] border-t border-l border-teal/40 rounded-full" style={{ animation: 'spin 15s linear infinite reverse' }} />
+                           <div className="absolute top-[25%] left-[25%] w-[50%] h-[50%] border-r border-b border-cream/20 rounded-full" style={{ animation: 'spin 25s linear infinite' }} />
+                        </div>
+
+                        {/* Center core */}
+                        <div className="absolute flex flex-col items-center justify-center z-30">
+                           <span className="font-mono text-[9px] text-teal/80 tracking-widest uppercase mb-1">Eng.Apex</span>
+                           <div className="w-1.5 h-1.5 bg-cream/90 rounded-full shadow-[0_0_10px_rgba(238,235,221,0.8)]"></div>
+                        </div>
+                     </div>
+
+                     {/* Mobile version of cosmos (inline, slightly smaller but same style) */}
+                     <div className="lg:hidden w-72 aspect-square mx-auto flex items-center justify-center relative overflow-visible my-12 pointer-events-none mix-blend-screen">
+                        {/* Outer rotating text ring */}
+                        <div className="absolute inset-0 z-20" style={{ animation: 'spin 40s linear infinite' }}>
+                           <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
+                              <path id="cosmos-text-path-mobile" d="M 50, 50 m -46, 0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" fill="transparent" />
+                              <text className="text-[7.5px] font-mono fill-cream/80 tracking-[0.2em] uppercase" aria-hidden="true">
+                                 <textPath href="#cosmos-text-path-mobile" startOffset="0%">
+                                    THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖ THE NOMAD'S COSMOS ❖
+                                 </textPath>
+                              </text>
+                           </svg>
+                        </div>
+
+                        {/* Inner geometric rings */}
+                        <div className="absolute w-[80%] h-[80%] rounded-full border border-teal/20 overflow-hidden">
                            <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: "url('/images/yurt-interior.png')" }} />
-                           <div className="absolute w-[90%] h-[90%] border border-cream/10 rounded-full" style={{ animation: 'spin 20s linear infinite' }} />
-                           <div className="absolute w-[70%] h-[70%] border border-teal/30 rounded-full" style={{ animation: 'spin 15s linear infinite reverse' }} />
-                           <div className="absolute w-[50%] h-[50%] border border-cream/5 rounded-full" style={{ animation: 'spin 25s linear infinite' }} />
-                           <span className="font-display italic text-xl md:text-2xl z-10 text-center px-4 text-cream/80">The Nomad&apos;s<br />Cosmos</span>
+                           <div className="absolute inset-0 border border-cream/10 rounded-full" style={{ animation: 'spin 20s linear infinite' }} />
+                           <div className="absolute top-[10%] left-[10%] w-[80%] h-[80%] border-t border-l border-teal/30 rounded-full" style={{ animation: 'spin 15s linear infinite reverse' }} />
+                           <div className="absolute top-[25%] left-[25%] w-[50%] h-[50%] border-r border-b border-cream/20 rounded-full" style={{ animation: 'spin 25s linear infinite' }} />
+                        </div>
+
+                        {/* Center core */}
+                        <div className="absolute flex flex-col items-center justify-center z-30">
+                           <span className="font-mono text-[8px] text-teal/80 tracking-widest uppercase mb-1">Eng.Apex</span>
+                           <div className="w-1 h-1 bg-cream/90 rounded-full shadow-[0_0_8px_rgba(238,235,221,0.8)]"></div>
                         </div>
                      </div>
 
                      {/* Right: Components */}
-                     <div className="lg:col-span-7 flex flex-col gap-4 md:gap-6 pt-0 lg:pt-12">
+                     <div className="lg:col-span-7 flex flex-col gap-4 md:gap-6 pt-0 lg:pt-12 relative z-10">
                         {content.yurt.components.map((comp, idx) => (
                            <motion.div
                               key={idx}
@@ -684,14 +1150,14 @@ export default function App() {
                         <div className="mt-8 h-48 md:h-64 w-full relative overflow-hidden border border-cream/5">
                            <img
                               src="/images/kerege-lattice.png"
-                              alt="Кереге тор құрылымы — киіз үйдің қабырға торы"
+                              alt="Kerege lattice structure — the wall lattice of the yurt"
                               width={1200}
                               height={600}
                               className="absolute inset-0 w-full h-full object-cover opacity-30 hover:scale-105 transition-transform duration-[2s]"
                               loading="lazy"
                            />
                            <div className="absolute bottom-3 left-3 bg-void px-3 py-1 font-mono text-[10px] border border-cream/10 text-mist/60" aria-hidden="true">
-                              FIG 2.1: КЕРЕГЕ ТОР ҚҰРЫЛЫМЫ
+                              FIG 2.1: KEREGE LATTICE STRUCTURE
                            </div>
                         </div>
 
@@ -708,8 +1174,8 @@ export default function App() {
 
             <Separator />
 
-            {/* ══════════ SECTION 4: ҮШ БАҒЫТ / TAXONOMY ══════════ */}
-            <section aria-label="Таксономиялық сыныптау" className="py-24 bg-void-light relative overflow-hidden">
+            {/* ══════════ SECTION 4: THREE DIRECTIONS / TAXONOMY ══════════ */}
+            <section aria-label="Taxonomic classification" className="py-24 bg-void-light relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-teal/20 to-transparent" aria-hidden="true" />
                {/* Corner geometric details */}
                <div className="absolute top-8 left-8 w-[200px] h-[200px] pointer-events-none hidden xl:block">
@@ -749,23 +1215,23 @@ export default function App() {
                      <div className="flex items-center gap-3 mb-4">
                         <CrosshairIcon className="w-4 h-4 text-amber" />
                         <span className="font-mono text-[10px] tracking-[0.2em] text-amber uppercase">
-                           Материалтану бақылауы
+                           Material Science Observation
                         </span>
                      </div>
                      <p className="font-body text-sm text-mist leading-relaxed">
-                        Киіз кератин талшықтарының бұралу және қабыршақты құрылымына байланысты жоғары жылу оқшаулау қасиеттеріне ие, бұл ауа қалталарын ұстауға мүмкіндік береді.
+                        Felt possesses high thermal insulation properties due to the twisted and scaly structure of keratin fibers, which allows for the trapping of air pockets.
                      </p>
                   </div>
                </div>
 
                {/* EST notation */}
                <div className="absolute bottom-4 right-6 font-mono text-[9px] text-mist/20" aria-hidden="true">
-                  EST. XIX ҒАСЫР
+                  EST. XIX CENTURY
                </div>
             </section>
 
-            {/* ══════════ SECTION 5: СЕМИОТИКА ══════════ */}
-            <section aria-label="Семиотика" className="py-24 px-4 md:px-6 relative z-10">
+            {/* ══════════ SECTION 5: SEMIOTICS ══════════ */}
+            <section aria-label="Semiotics" className="py-24 px-4 md:px-6 relative z-10">
                {/* Background geometric details */}
                <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[350px] h-[350px] pointer-events-none hidden xl:block">
                   <GeometricAbstraction variant="grid" className="w-full h-full" />
@@ -803,7 +1269,7 @@ export default function App() {
 
                   {/* Symbol Decoder (C6 — Added keyboard support, ARIA roles) */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16">
-                     <div role="listbox" aria-label="Семиотикалық символдар" className="space-y-1">
+                     <div role="listbox" aria-label="Semiotic symbols" className="space-y-1">
                         {content.semiotics.symbols.map((symbol, idx) => (
                            <div
                               key={idx}
@@ -858,10 +1324,10 @@ export default function App() {
                            <AnimatePresence mode="wait">
                               <motion.div
                                  key={activeSymbol ?? 'default'}
-                                 initial={{ opacity: 0, scale: 0.9 }}
+                                 initial={{ opacity: 0, scale: 0.95 }}
                                  animate={{ opacity: 1, scale: 1 }}
-                                 exit={{ opacity: 0, scale: 1.1 }}
-                                 transition={{ duration: 0.4 }}
+                                 exit={{ opacity: 0, scale: 0.95 }}
+                                 transition={{ duration: 0.15, ease: "easeInOut" }}
                                  className="flex flex-col items-center"
                               >
                                  {activeSymbol !== null ? (
@@ -882,7 +1348,7 @@ export default function App() {
                                        </h4>
                                        <p className="font-mono text-[10px] mt-2 tracking-[0.25em]"
                                           style={{ color: content.semiotics.symbols[activeSymbol].color }}>
-                                          СЕМИОТИКАЛЫҚ ДЕРЕКТЕР АНЫҚТАЛДЫ
+                                          SEMIOTIC DATA IDENTIFIED
                                        </p>
                                     </>
                                  ) : (
@@ -891,7 +1357,7 @@ export default function App() {
                                           <div className="w-2 h-2 bg-cream rounded-full" />
                                        </div>
                                        <p className="font-mono text-[10px] text-mist/20 tracking-widest">
-                                          ДЕКОДТАУ ҮШІН ДЕРЕКТЕРДІ ТАҢДАҢЫЗ
+                                          SELECT DATA FOR DECODING
                                        </p>
                                     </>
                                  )}
@@ -905,8 +1371,8 @@ export default function App() {
 
             <Separator />
 
-            {/* ══════════ SECTION 6: КӨРМЕ / GALLERY (C5 — Content now always visible on mobile) ══════════ */}
-            <section ref={galleryRef} aria-label="Артефакт галереясы" className="relative h-screen overflow-hidden bg-void-light">
+            {/* ══════════ SECTION 6: GALLERY / GALLERY (C5 — Content now always visible on mobile) ══════════ */}
+            <section ref={galleryRef} aria-label="Artifact gallery" className="relative h-screen overflow-hidden bg-void-light">
                <CoordinateMarker x="right-6" y="top-6" label="SEC:05.GALLERY" />
                <div className="absolute bottom-12 left-12 w-[200px] h-[200px] pointer-events-none hidden xl:block z-10">
                   <GeometricAbstraction variant="diamond" className="w-full h-full" />
@@ -935,8 +1401,8 @@ export default function App() {
                </div>
             </section>
 
-            {/* ══════════ SECTION 7: ЗАМАНАУИ АҒЫМДАР / CONTEMPORARY ══════════ */}
-            <section aria-label="Заманауи ағымдар" className="py-24 relative">
+            {/* ══════════ SECTION 7: CONTEMPORARY TRENDS / CONTEMPORARY ══════════ */}
+            <section aria-label="Contemporary trends" className="py-24 relative">
                <CoordinateMarker x="left-6" y="top-6" label="SEC:06.CONTEMPORARY" />
                <div className="absolute top-12 right-12 w-[250px] h-[250px] pointer-events-none hidden xl:block z-[1]">
                   <HexGrid className="w-full h-full text-cream" />
@@ -964,7 +1430,7 @@ export default function App() {
                         ))}
                      </SectionTitle>
                      <p className="font-body text-sm text-mist/70 max-w-xs text-right hidden md:block">
-                        Функционалды өндірістен эстетикалық өндіріске өлшенетін ауысу.
+                        Measurable shift from functional production to aesthetic production.
                      </p>
                   </div>
 
@@ -979,7 +1445,7 @@ export default function App() {
                      >
                         <img
                            src="/images/contemporary-fashion.png"
-                           alt="Нео-фольклорлық парадигма — жоғары сән мен дәстүрлі тоқыма"
+                           alt="Neo-folkloric paradigm — high fashion and traditional textile"
                            width={800}
                            height={600}
                            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
@@ -1009,7 +1475,7 @@ export default function App() {
                            className="border border-cream/5 bg-void hover:border-teal/30 transition-colors duration-500 flex-1 overflow-hidden"
                         >
                            <div className="relative h-28 overflow-hidden">
-                              <img src="/images/ecological-wool.png" alt="Экологиялық жүн" className="w-full h-full object-cover opacity-30" loading="lazy" />
+                              <img src="/images/ecological-wool.png" alt="Ecological wool" className="w-full h-full object-cover opacity-30" loading="lazy" />
                               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-void" />
                            </div>
                            <div className="p-6 md:p-8">
@@ -1037,7 +1503,7 @@ export default function App() {
                         >
                            <img
                               src="/images/digital-ornament.png"
-                              alt="Цифрлық синтез — алгоритмдік ою генерациясы"
+                              alt="Digital synthesis — algorithmic ornament generation"
                               width={600}
                               height={400}
                               className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500"
@@ -1059,7 +1525,7 @@ export default function App() {
             </section>
          </main>
 
-         {/* ══════════ SECTION 8: FOOTER / МҰРА ══════════ */}
+         {/* ══════════ SECTION 8: FOOTER / HERITAGE ══════════ */}
          <footer className="py-24 px-4 md:px-6 border-t border-cream/5 bg-void relative overflow-hidden" role="contentinfo">
             <CoordinateMarker x="left-6" y="top-6" label="SEC:07.HERITAGE" />
             <div className="absolute top-8 right-8 w-[250px] h-[250px] pointer-events-none hidden xl:block">
@@ -1081,7 +1547,7 @@ export default function App() {
 
                   {/* Disciplines */}
                   <div className="space-y-4">
-                     <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-4 uppercase">ПӘНДЕР</h3>
+                     <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-4 uppercase">DISCIPLINES</h3>
                      <ul className="space-y-3">
                         {content.footer.disciplines.map((d, i) => (
                            <li key={i} className="group">
@@ -1098,19 +1564,19 @@ export default function App() {
                   {/* Contact */}
                   <div className="flex flex-col justify-between">
                      <div>
-                        <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-4 uppercase">КООРДИНАТТАР</h3>
+                        <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-4 uppercase">COORDINATES</h3>
                         <div className="space-y-1 font-mono text-xs text-mist/50">
-                           <p>Алматы, Қазақстан</p>
+                           <p>Almaty, Kazakhstan</p>
                            <p>43.2220° N, 76.8512° E</p>
-                           <p lang="en">Жүйе: Earth-01</p>
+                           <p lang="en">System: Earth-01</p>
                         </div>
                      </div>
                      <div className="mt-6">
-                        <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-3 uppercase">СІЛТЕМЕЛЕР</h3>
+                        <h3 className="font-mono text-[10px] text-teal tracking-[0.3em] mb-3 uppercase">LINKS</h3>
                         <div className="space-y-1 font-mono text-xs text-mist/40">
-                           <p>Тарих & Контекст</p>
-                           <p>Технологиялық Стек</p>
-                           <p>Семиотикалық Деректер</p>
+                           <p>History & Context</p>
+                           <p>Technological Stack</p>
+                           <p>Semiotic Data</p>
                         </div>
                      </div>
                   </div>
@@ -1123,7 +1589,7 @@ export default function App() {
                   </div>
                   <div className="text-[9px] text-mist/20 text-center md:text-right">
                      <span className="font-pixel-line">© 2026 REQUIEM ARCHIVE.</span><br />
-                     <span className="font-mono">БАРЛЫҚ ҚҰҚЫҚТАР ҚОРҒАЛҒАН.</span>
+                     <span className="font-mono">ALL RIGHTS RESERVED.</span>
                   </div>
                </div>
             </div>

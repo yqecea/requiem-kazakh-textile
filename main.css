@@ -244,3 +244,128 @@ body {
 .fluid-heading-lg {
   font-size: clamp(2rem, 5vw, 4.5rem);
 }
+
+/* ═══════════════════════════════════════════════
+   GSAP TEXT SPLITTING UTILITIES
+   ═══════════════════════════════════════════════ */
+.split-line {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.split-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════
+   CRT & FLICKER
+   ═══════════════════════════════════════════════ */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+  background-size: 100% 4px, 6px 100%;
+  z-index: 10;
+  mix-blend-mode: multiply;
+}
+
+.crt-flicker {
+  animation: crtFlicker 0.15s infinite;
+  opacity: 0.95;
+}
+
+@keyframes crtFlicker {
+  0% {
+    opacity: 0.95;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+
+  100% {
+    opacity: 0.95;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   GSAP HERO TEXT DRAWING
+   ═══════════════════════════════════════════════ */
+.requiem-text {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(232, 224, 208, 0.8);
+}
+
+.requiem-text span {
+  position: relative;
+  display: inline-block;
+  transition: color 1s cubic-bezier(0.8, 0, 0.1, 1);
+}
+
+.requiem-filled {
+  color: var(--color-cream);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 0 30px rgba(232, 224, 208, 0.3);
+}
+
+
+
+/* ═══════════════════════════════════════════════
+   BENTO GRID
+   ═══════════════════════════════════════════════ */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  grid-auto-rows: minmax(200px, auto);
+}
+
+.bento-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.bento-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════
+   SVG NODE PATH (Telemetry Section)
+   ═══════════════════════════════════════════════ */
+.gs-node-path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+
+.gs-node {
+  transform-origin: center;
+}
+
+/* ═══════════════════════════════════════════════
+   SCAN ANIMATION (Status card)
+   ═══════════════════════════════════════════════ */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
+}
